@@ -21,7 +21,7 @@ class CreateTodoTable extends Migration
             $table->boolean('has_checkbox')->nullable(false)->default(false);
             $table->date('month_of_the_task')->nullable(false);
             $table->dateTime('conclusion_date')->nullable(true);
-            $table->dateTime('is_done')->nullable(false)->default(false);
+            $table->dateTime('is_done')->nullable(false);
             $table->timestamps();
 
             $table->foreign('user_id')

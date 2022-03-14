@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LoginToken;
 use App\Models\User;
 
 class UserService
@@ -16,7 +17,14 @@ class UserService
         $token = '';
         for ($i = 0; $i <= 10; $i++) {
             $millisseconds = round(microtime(true) * 1000);
-            $token = $token . md5($millisseconds);
+            $token = $token . hash('sha256', $millisseconds);
+        }
+        $loginTokenExist = LoginToken::query()
+            ->where('token', $token)
+            ->exists();
+
+        if($loginTokenExist) {
+            return self::getToken();
         }
 
         return $token;

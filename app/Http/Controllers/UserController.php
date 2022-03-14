@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Dto\UserDto;
 use App\Enums\ErrorEnum;
-use App\Enums\SuccessEnum;
 use App\Models\LoginToken;
 use App\Models\User;
 use App\Services\UserService;
+use App\Validators\UserValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,41 +15,34 @@ use Illuminate\Http\Response;
 class UserController extends Controller
 {
     /**
+     * @var UserDto
+     */
+    private UserDto $userDto;
+
+    public function __construct(UserDto $userDto)
+    {
+        $this->userDto = $userDto;
+    }
+
+    /**
      * @param Request $request
      * @return JsonResponse
      */
     public function createUser(Request $request): JsonResponse
     {
-//        $this->validate($request, [
-//            'name' => 'required',
-//            'email' => 'required|unique:users',
-//            'password' => 'required',
-//            'confirmPassword' => 'require',
-//        ]);
+        $this->userDto->attachValues($request->all());
+        $validatePayload = UserValidator::validateCreateAccount($this->userDto);
 
-        if ($request->get('password') == $request->get('confirmPassword')) {
-            return response()->json(
-                [
-                    'error' => true,
-                    'message' => ErrorEnum::PASSWORDS_DOESNT_MATCH
-                ],
-                Response::HTTP_NOT_ACCEPTABLE
-            );
+        if($validatePayload['error']) {
+            return response()->json($validatePayload, Response::HTTP_NOT_ACCEPTABLE);
         }
-
         User::create([
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'password' => md5($request->get('password')),
+            'name' => $this->userDto->name,
+            'email' => $this->userDto->email,
+            'password' => md5($this->userDto->password),
         ]);
 
-        return response()->json(
-            [
-                'error' => false,
-                'message' => SuccessEnum::USER_CREATED,
-            ],
-            Response::HTTP_OK
-        );
+        return response()->json($validatePayload, Response::HTTP_OK);
     }
 
     /**
@@ -57,44 +51,25 @@ class UserController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-//        $this->validate($request, [
-//            'email' => 'required',
-//            'password' => 'required',
-//        ]);
-        dd('aq');
+        $this->userDto->attachValues($request->all());
+        $isLoginValid = UserValidator::validateLogin($this->userDto);
 
-        $user = UserService::getUserByEmail($request->get('email'));
-        if (is_null($user)) {
-            return response()->json(
-                [
-                    'error' => true,
-                    'message' => ErrorEnum::PASSWORDS_DOESNT_MATCH,
-                ],
-                Response::HTTP_NOT_ACCEPTABLE
-            );
-        }
-
-        if (md5($request->get('password') != $user->password)) {
-            return response()->json(
-                [
-                    'error' => true,
-                    'message' => ErrorEnum::PASSWORDS_DOESNT_MATCH,
-                ],
-                Response::HTTP_NOT_ACCEPTABLE
-            );
+        if (!$isLoginValid) {
+            return response()->json([
+                'error' => true,
+                'message' => ErrorEnum::LOGIN_FAIL,
+            ]);
         }
         $token = UserService::getToken();
+        $user = UserService::getUserByEmail($this->userDto->email);
         LoginToken::create([
-            'user_id' => $user->id,
             'token' => $token,
+            'user_id' => $user->id,
         ]);
 
-        return response()->json(
-            [
-                'error' => false,
-                'token' => UserService::getToken(),
-            ],
-            Response::HTTP_NOT_ACCEPTABLE
-        );
+        return response()->json([
+            'error' => false,
+            'token' => $token,
+        ]);
     }
 }

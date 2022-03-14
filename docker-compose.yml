@@ -1,0 +1,13 @@
+version: '3'
+services:
+
+  tracking-database:
+    container_name: todoDatabase
+    image: postgres:10
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    command: -c "listen_addresses=*"
+    ports:
+      - "5471:5432"
