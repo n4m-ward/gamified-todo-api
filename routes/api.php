@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 //Route::middleware('auth:sanctum');
 
+Route::get('/health-check', function () {
+    return response()->json(null);
+});
 Route::post('/user', [UserController::class, 'createUser']);
 Route::post('/login', [UserController::class, 'login']);
 
