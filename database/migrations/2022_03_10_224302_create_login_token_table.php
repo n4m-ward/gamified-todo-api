@@ -17,6 +17,7 @@ class CreateLoginTokenTable extends Migration
             $table->id();
             $table->bigInteger('user_id')->nullable(false)->unsigned();
             $table->string('token', 3000)->nullable(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
