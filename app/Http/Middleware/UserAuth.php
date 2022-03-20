@@ -33,7 +33,7 @@ class UserAuth
             throw new Exception('Login expirado!');
         }
         $user = User::query()->find($loginToken->user_id);
-        UserSingleton::setUser($user);
+        UserSingleton::set($user);
 
         return $next($request);
     }

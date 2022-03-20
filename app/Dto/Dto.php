@@ -27,7 +27,7 @@ class Dto
     {
         $arrayToReturn = [];
         $classProperties = get_class_vars(get_class($this));
-        foreach ($classProperties as $classProperty) {
+        foreach ($classProperties as $classProperty => $value) {
             $propertyValue = $this->{$classProperty};
             if (is_null($propertyValue)) {
                 continue;
