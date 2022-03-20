@@ -19,4 +19,4 @@ jobs:
       - name: Installing dependencies
         run: composer install
       - name: Running sniffer PSR12
-        run: ./vendor/bin/phpcs --standard=PSR12 --encoding=utf-8 -p -n --colors --report=code --ignore=*/vendor*/,*/database*/,_ide_helper.php ./
+        run: .scripts/lint.sh

@@ -34,7 +34,7 @@ done
 if [ "$FILES" != "" ]; then
     log "Running Code Sniffer for ${FILES_TO_LINT}"
     # shellcheck disable=SC2086
-    ./vendor/bin/phpcs --standard=PSR12 --encoding=utf-8 -p --colors --report=code ${FILES_TO_LINT} --ignore=*/vendor*/,*/database*/,_ide_helper.php ./
+    ./vendor/bin/phpcs --standard=PSR12 --encoding=utf-8 -p --colors --report=code /app /tests /config /routes --ignore=*/vendor*/,*/database*/,_ide_helper.php ./
 fi
 
 exit $?

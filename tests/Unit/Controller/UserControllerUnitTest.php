@@ -198,7 +198,7 @@ class UserControllerUnitTest extends TestCase
             'password' => md5('wrongPassword'),
         ]);
         $request = $this->getFakeRequest($params, 'POST');
-        $result = $this->userController->login($request)->getOriginalContent();;
+        $result = $this->userController->login($request)->getOriginalContent();
 
         $this->assertTrue($result['error']);
         $this->assertEquals(ErrorEnum::LOGIN_FAIL, $result['message']);
