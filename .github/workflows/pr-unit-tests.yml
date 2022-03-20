@@ -18,7 +18,7 @@ jobs:
           php-version: 7.4
           extensions: pgsql, pdo_pgsql
       - name: Uping database container
-        run: docker run --name database -e POSTGRES_USER=test -e POSTGRES_DB=test -e POSTGRES_PASSWORD=test -p 5440:5432 -d -h 0.0.0.0 postgres:13.3 -c log_statement=all
+        run: docker run --name database -e POSTGRES_USER=test -e POSTGRES_DB=test -e POSTGRES_PASSWORD=test -p 5471:5432 -d -h 0.0.0.0 postgres:13.3 -c log_statement=all
       - name: Waiting to database container be ready
         run: sleep 5
 
