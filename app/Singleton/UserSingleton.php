@@ -11,12 +11,12 @@ class UserSingleton
      */
     private static User $user;
 
-    public static function setUser(User $user): void
+    public static function set(User $user): void
     {
         self::$user = $user;
     }
 
-    public static function getUser(): User
+    public static function get(): User
     {
         return self::$user;
     }
