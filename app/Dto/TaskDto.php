@@ -17,6 +17,13 @@ class TaskDto extends Dto
     public ?int $taskTypeId = null;
     public ?int $originalTaskId = null;
 
+    /**
+     * @var array CheckboxDto[]
+     */
     public array $checkbox = [];
+
+    /**
+     * @var array MetaDto[]
+     */
     public array $meta = [];
 }

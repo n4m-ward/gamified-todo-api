@@ -24,6 +24,9 @@ class TaskServiceUnitTest extends TestCase
         parent::setUp();
         $this->taskService = new TaskService();
         $this->taskDto = new TaskDto();
+        $dateNow = '2022-03-27';
+        $dateNow = Carbon::createFromFormat('Y-m-d', $dateNow);
+        Carbon::setTestNow($dateNow);
     }
 
     public function testMakeTaskDtoWorks(): void
@@ -150,5 +153,106 @@ class TaskServiceUnitTest extends TestCase
         $duplicatedTasks = Task::query()->where('original_task_id', $result['task']->id)->get();
 
         $this->assertCount(4, $duplicatedTasks);
+    }
+
+    public function testCreateAndDuplicateTaskRepeat3TimesTOInfinityMensalTasks(): void
+    {
+        $this->taskDto->title  = 'titleTest';
+        $this->taskDto->taskTypeId = TaskType::TASK_MENSAL;
+        $this->taskDto->qtyRepeats = 1;
+        $this->taskDto->repeatForever = true;
+        $this->taskDto->userId = User::factory()->create()->id;
+        $this->taskDto->dateOfTheTask = Carbon::now()->format('Y-m-d H:i:s');
+        $this->taskService->createAndDuplicateTask($this->taskDto);
+        $result = Task::query()
+            ->where('user_id', $this->taskDto->userId)
+            ->where('title', $this->taskDto->title)
+            ->get();
+
+        $this->assertCount(3, $result);
+    }
+
+    public function testCreateAndDuplicateTaskRepeat13TimesTOInfinityWeeksTasks(): void
+    {
+        $this->taskDto->title  = 'titleTest';
+        $this->taskDto->taskTypeId = TaskType::TASK_SEMANAL;
+        $this->taskDto->qtyRepeats = 1;
+        $this->taskDto->repeatForever = true;
+        $this->taskDto->userId = User::factory()->create()->id;
+        $this->taskDto->dateOfTheTask = Carbon::now()->format('Y-m-d H:i:s');
+        $this->taskService->createAndDuplicateTask($this->taskDto);
+        $result = Task::query()
+            ->where('user_id', $this->taskDto->userId)
+            ->where('title', $this->taskDto->title)
+            ->get();
+
+        $this->assertCount(13, $result);
+    }
+
+    public function testCreateAndDuplicateTaskRepeat92TimesTOInfinityDailyTasks(): void
+    {
+        $this->taskDto->title  = 'titleTest';
+        $this->taskDto->taskTypeId = TaskType::TASK_DIARIA;
+        $this->taskDto->qtyRepeats = 1;
+        $this->taskDto->repeatForever = true;
+        $this->taskDto->userId = User::factory()->create()->id;
+        $this->taskDto->dateOfTheTask = Carbon::now()->format('Y-m-d H:i:s');
+        $this->taskService->createAndDuplicateTask($this->taskDto);
+        $result = Task::query()
+            ->where('user_id', $this->taskDto->userId)
+            ->where('title', $this->taskDto->title)
+            ->get();
+
+        $this->assertCount(92, $result);
+    }
+
+    public function testCreateAndDuplicateTaskRepeat2TimesTOInfinityMensalTasksThatBeginNextMorning(): void
+    {
+        $this->taskDto->title  = 'titleTest';
+        $this->taskDto->taskTypeId = TaskType::TASK_MENSAL;
+        $this->taskDto->qtyRepeats = 1;
+        $this->taskDto->repeatForever = true;
+        $this->taskDto->userId = User::factory()->create()->id;
+        $this->taskDto->dateOfTheTask = Carbon::now()->addMonth()->format('Y-m-d H:i:s');
+        $this->taskService->createAndDuplicateTask($this->taskDto);
+        $result = Task::query()
+            ->where('user_id', $this->taskDto->userId)
+            ->where('title', $this->taskDto->title)
+            ->get();
+
+        $this->assertCount(2, $result);
+    }
+
+    public function testCreateAndDuplicateTaskRepeat11TimesTOInfinityWeeksTasksThatBeginInTwoWeeks(): void
+    {
+        $this->taskDto->title  = 'titleTest';
+        $this->taskDto->taskTypeId = TaskType::TASK_SEMANAL;
+        $this->taskDto->repeatForever = true;
+        $this->taskDto->userId = User::factory()->create()->id;
+        $this->taskDto->dateOfTheTask = Carbon::now()->addWeeks(2)->format('Y-m-d H:i:s');
+        $this->taskService->createAndDuplicateTask($this->taskDto);
+        $result = Task::query()
+            ->where('user_id', $this->taskDto->userId)
+            ->where('title', $this->taskDto->title)
+            ->get();
+
+        $this->assertCount(11, $result);
+    }
+
+    public function testCreateAndDuplicateTaskRepeat70TimesTOInfinityDailyTasksThatBeginIn22Days(): void
+    {
+        $this->taskDto->title  = 'titleTest';
+        $this->taskDto->taskTypeId = TaskType::TASK_DIARIA;
+        $this->taskDto->qtyRepeats = 1;
+        $this->taskDto->repeatForever = true;
+        $this->taskDto->userId = User::factory()->create()->id;
+        $this->taskDto->dateOfTheTask = Carbon::now()->addDays(22)->format('Y-m-d H:i:s');
+        $this->taskService->createAndDuplicateTask($this->taskDto);
+        $result = Task::query()
+            ->where('user_id', $this->taskDto->userId)
+            ->where('title', $this->taskDto->title)
+            ->get();
+
+        $this->assertCount(70, $result);
     }
 }

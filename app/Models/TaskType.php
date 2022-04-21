@@ -19,10 +19,10 @@ class TaskType extends Model
       self::TASK_MENSAL => 'Task Mensal',
     ];
 
-    public const DATE_INTERVAL_IN_DAYS = [
-      self::TASK_DIARIA => 1,
-      self::TASK_SEMANAL => 7,
-      self::TASK_MENSAL => 30,
+    public const CARBON_METHOD_TO_ADD_DAYS = [
+      self::TASK_DIARIA => 'addDays',
+      self::TASK_SEMANAL => 'addWeeks',
+      self::TASK_MENSAL => 'addMonths',
     ];
 
     public $table = 'task_type';

@@ -12,15 +12,16 @@ class Task extends Model
     public $table = 'task';
 
     public $fillable = [
-      'user_id',
-      'description',
-      'expired',
-      'date_of_the_task',
-      'conclusion_date',
-      'is_done',
-      'qty_repeats',
-      'repeat_forever',
-      'task_type_id',
-      'original_task_id',
+        'user_id',
+        'description',
+        'expired',
+        'date_of_the_task',
+        'conclusion_date',
+        'is_done',
+        'qty_repeats',
+        'repeat_forever',
+        'task_type_id',
+        'original_task_id',
+        'title',
     ];
 }

@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 
 class TaskService
 {
+    public const CARBON_FUNCTION_TO_GET_DIFF_DATE = [
+        TaskType::TASK_MENSAL => 'diffInMonths',
+        TaskType::TASK_SEMANAL => 'diffInWeeks',
+        TaskType::TASK_DIARIA => 'diffInDays',
+    ];
+
     public static function makeTaskDto(Request $request): TaskDto
     {
         $dto = new TaskDto();
@@ -33,7 +39,7 @@ class TaskService
         return $dto;
     }
 
-    public function createTask(TaskDto $taskDto): array
+    public static function createTask(TaskDto $taskDto): array
     {
         $arrayToReturn = [];
         $task = $taskDto->toArray(true);
@@ -65,33 +71,43 @@ class TaskService
         $firstTaskAreInserted = false;
         $arrayToReturn = null;
 
-        while ($taskDto->qtyRepeats >= 1) {
+        $qtyRepeats = $this->getQtyRepeats($taskDto);
+        while ($qtyRepeats >= 1) {
             if ($firstTaskAreInserted) {
                 $taskDto->dateOfTheTask = $this->getDateOfTheFutureTask($taskDto);
                 $taskDto->originalTaskId = $arrayToReturn['task']->id;
             }
             $result = $this->createTask($taskDto);
-            if (is_null($arrayToReturn)) {
+            if (!$firstTaskAreInserted) {
                 $arrayToReturn = $result;
             }
 
-            $taskDto->qtyRepeats --;
+            $qtyRepeats--;
             $firstTaskAreInserted = true;
         }
+
         return $arrayToReturn;
+    }
+
+    public function getQtyRepeats(TaskDto $taskDto): int
+    {
+        if (!$taskDto->repeatForever) {
+            return $taskDto->qtyRepeats;
+        }
+
+        $dateOfTheDask = Carbon::createFromFormat('Y-m-d H:i:s', $taskDto->dateOfTheTask);
+        $dateAfter3Months = Carbon::now()->addMonths(3);
+        $carbonDiffMethod = self::CARBON_FUNCTION_TO_GET_DIFF_DATE[$taskDto->taskTypeId];
+
+        return $dateAfter3Months->{$carbonDiffMethod}($dateOfTheDask);
     }
 
     public function getDateOfTheFutureTask(TaskDto $taskDto): string
     {
-        $dateIntervalInDays = $this->getDateIntervalInDaysByTaskTypeId($taskDto);
+        $carbonMethodToArddDays = TaskType::CARBON_METHOD_TO_ADD_DAYS[$taskDto->taskTypeId];
 
         return Carbon::createFromFormat('Y-m-d H:i:s', $taskDto->dateOfTheTask)
-            ->addDays($dateIntervalInDays)
+            ->{$carbonMethodToArddDays}(1)
             ->format('Y-m-d H:i:s');
-    }
-
-    private function getDateIntervalInDaysByTaskTypeId(TaskDto $taskDto): int
-    {
-        return TaskType::DATE_INTERVAL_IN_DAYS[$taskDto->taskTypeId];
     }
 }
